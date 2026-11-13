@@ -1,0 +1,26 @@
+SRI SIDDALINGESHWARA IRRIGATION - ESTIMATE BOOK (installable app)
+
+This folder is a complete app. It must be put on a website (https) once.
+After that it installs on the phone like a normal app and works offline.
+
+STEP 1  Put the folder online (free, about 2 minutes)
+  Option A (easiest): open https://app.netlify.com/drop on a computer,
+          drag this whole unzipped folder onto the page. You get a link.
+  Option B: upload the folder to GitHub and turn on GitHub Pages.
+  Keep the link. Do not rename files inside the folder.
+
+STEP 2  Install on the Android phone
+  Open the link in Chrome. Wait a few seconds. Tap the menu (3 dots),
+  then "Install app" (or "Add to Home screen"). The app icon appears
+  on the home screen and opens full-screen.
+
+STEP 3  First use
+  Tap the gear icon: check business details, enter the UPI ID, tap
+  "Clear sample data". Tap "Save backup" now and then.
+
+Want a real .apk file (for sharing on WhatsApp or Play Store)?
+  Open https://www.pwabuilder.com , paste the link from Step 1,
+  choose Android and download the package.
+
+Language: the button at the top right switches English / Kannada.
+Data is stored on the phone only. Use "Save backup" to keep a copy.

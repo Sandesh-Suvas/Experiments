@@ -1,0 +1,704 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0e2b3a"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png"><style>:root{color-scheme:light dark}html,body{margin:0}</style></head><body><title>Irrigation Estimate Book</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>@font-face{font-family:'Inter';font-weight:400;font-style:normal;font-display:swap;src:url(fonts/inter-latin-400-normal.woff2) format('woff2')}@font-face{font-family:'Inter';font-weight:600;font-style:normal;font-display:swap;src:url(fonts/inter-latin-600-normal.woff2) format('woff2')}@font-face{font-family:'Inter';font-weight:700;font-style:normal;font-display:swap;src:url(fonts/inter-latin-700-normal.woff2) format('woff2')}@font-face{font-family:'Space Grotesk';font-weight:500;font-style:normal;font-display:swap;src:url(fonts/space-grotesk-latin-500-normal.woff2) format('woff2')}@font-face{font-family:'Space Grotesk';font-weight:700;font-style:normal;font-display:swap;src:url(fonts/space-grotesk-latin-700-normal.woff2) format('woff2')}</style>
+<style>
+/* Layout: brand band on top, one scrolling working area, thumb-reach tab bar at the bottom.
+   Palette taken from the shop's own letterhead: deep teal-navy, canal green, brass gold, water blue. */
+:root{
+  --bg:#eef3f0; --surface:#ffffff; --surface2:#e5ede9; --fg:#11221e; --muted:#566a63; --line:#d0dcd6;
+  --brand:#0e2b3a; --brand2:#12594b; --on-brand:#ffffff; --gold:#e5a62d; --accent:#0f6b58; --accent-fg:#ffffff;
+  --water:#1a8cc7; --good:#1b8a4b; --warn:#a96a00; --bad:#c0392b; --good-bg:#dcf2e5; --warn-bg:#fbefd3; --water-bg:#dcedf8; --bad-bg:#f8dcd8;
+  --paper:#ffffff; --paper-fg:#14201c; --paper-line:#c9d3ce; --shadow:0 1px 2px rgba(14,43,58,.08),0 4px 14px rgba(14,43,58,.06);
+  --f-head:'Space Grotesk',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --f-body:'Inter','Noto Sans Kannada',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0b1512; --surface:#13211d; --surface2:#1a2b26; --fg:#e4efea; --muted:#91a79f; --line:#28403a;
+  --accent:#3ec2a0; --accent-fg:#06211a; --water:#59b8ea; --good:#4cc883; --warn:#e8b04a; --bad:#f1786a;
+  --good-bg:#17382a; --warn-bg:#3a2e12; --water-bg:#132f40; --bad-bg:#40201c; --shadow:0 1px 2px rgba(0,0,0,.4); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0b1512; --surface:#13211d; --surface2:#1a2b26; --fg:#e4efea; --muted:#91a79f; --line:#28403a;
+  --accent:#3ec2a0; --accent-fg:#06211a; --water:#59b8ea; --good:#4cc883; --warn:#e8b04a; --bad:#f1786a;
+  --good-bg:#17382a; --warn-bg:#3a2e12; --water-bg:#132f40; --bad-bg:#40201c; --shadow:0 1px 2px rgba(0,0,0,.4); color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.45;
+  padding-bottom:92px}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));max-width:760px;margin:0 auto}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{font-family:var(--f-head);margin:0;text-wrap:balance}
+h1{font-size:22px;letter-spacing:-.01em}
+h2{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700;font-family:var(--f-body)}
+.num{font-variant-numeric:tabular-nums}
+
+/* brand band */
+.brand{background:linear-gradient(100deg,var(--brand),var(--brand2));color:var(--on-brand);border-bottom:3px solid var(--gold)}
+.brand .wrap{padding-block:14px 12px;display:flex;gap:12px;align-items:flex-start}
+.logo{flex:none;width:42px;height:42px;border-radius:50%;border:2px solid var(--gold);display:grid;place-items:center;background:rgba(255,255,255,.08)}
+.brand-main{min-width:0;flex:1}
+.brand h3{font-size:18px;line-height:1.15;letter-spacing:.01em;text-transform:uppercase}
+.brand p{margin:3px 0 0;font-size:12px;color:rgba(255,255,255,.82)}
+.brand .tag{color:var(--gold);font-weight:600}
+.gear{flex:none;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;width:40px;height:40px;border-radius:10px;display:grid;place-items:center;cursor:pointer}
+
+main{padding-block:16px 8px;display:flex;flex-direction:column;gap:14px}
+.head-row{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.sub{color:var(--muted);font-size:13px;margin:2px 0 0}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px;min-width:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media (max-width:480px){.grid2.stack{grid-template-columns:1fr}}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);font-weight:600;min-width:0}
+input,select,textarea{width:100%;min-height:44px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-size:16px;color:var(--fg);min-width:0}
+textarea{min-height:96px;resize:vertical}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+input[type=number]{-moz-appearance:textfield}
+
+.btn{min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:600;font-size:14px;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;color:var(--fg)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#2b1d00}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn.danger.armed{background:var(--bad);color:#fff}
+.btn.small{min-height:36px;padding:0 12px;font-size:13px}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.btns .btn{flex:1 1 140px}
+
+/* segmented tier control */
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--surface2);border-radius:11px;padding:3px;gap:3px}
+.seg{position:relative}
+.seg input{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;min-height:0;padding:0;border:0;margin:0}
+.seg label{display:grid;place-items:center;min-height:40px;border-radius:9px;font-weight:600;font-size:14px;cursor:pointer;color:var(--muted)}
+.seg input:checked+label{background:var(--surface);color:var(--fg);box-shadow:var(--shadow)}
+.seg input:focus-visible+label{outline:2px solid var(--accent)}
+
+/* estimate lines */
+.line{border:1px solid var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px;background:var(--bg)}
+.line-top{display:flex;gap:8px;align-items:center}
+.sno{flex:none;width:26px;height:26px;border-radius:50%;background:var(--surface2);display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--muted)}
+.line select{flex:1;min-width:0;background:var(--surface)}
+.x{flex:none;width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer;font-size:20px;line-height:1}
+.line-bot{display:grid;grid-template-columns:92px 1fr 1fr;gap:8px;align-items:end}
+.line-bot .qty input{background:var(--surface)}
+.kv{display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--muted);font-weight:600}
+.kv b{font-size:15px;color:var(--fg);font-weight:600}
+.kv.right{text-align:right;align-items:flex-end}
+.catline{font-size:12px;color:var(--muted);padding-left:34px;margin-top:-4px}
+
+.totals{display:flex;flex-direction:column;gap:8px}
+.trow{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.trow .in{width:130px}
+.trow .in input{text-align:right}
+.grand{background:linear-gradient(100deg,var(--brand),var(--brand2));color:#fff;border-radius:12px;padding:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:3px solid var(--gold)}
+.grand span{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:rgba(255,255,255,.85)}
+.grand b{font-family:var(--f-head);font-size:26px}
+
+/* price list */
+.search{position:relative}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+.chip{flex:none;min-height:34px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-size:13px;font-weight:600;cursor:pointer;color:var(--muted)}
+.chip[aria-pressed=true]{background:var(--brand);border-color:var(--brand);color:#fff}
+.cat-h{margin:6px 0 -4px}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 12px;display:flex;flex-direction:column;gap:8px;cursor:pointer;text-align:left;width:100%}
+.item-top{display:flex;justify-content:space-between;gap:10px}
+.item-name{font-weight:600;min-width:0}
+.code{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em}
+.unit{font-size:12px;color:var(--muted);white-space:nowrap}
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.tier{background:var(--bg);border-radius:8px;padding:5px 8px;display:flex;flex-direction:column;font-size:11px;color:var(--muted);font-weight:600}
+.tier b{font-size:14px;color:var(--fg)}
+.spec{font-size:12px;color:var(--muted)}
+
+/* calculator */
+.out{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+.out:last-child{border:0}
+.out span{color:var(--muted);font-size:13px}
+.out b{font-family:var(--f-head);font-size:17px;text-align:right}
+.bud{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-bottom:1px solid var(--line)}
+.bud-top{display:flex;justify-content:space-between;gap:10px;font-weight:600}
+.bud-top small{color:var(--muted);font-weight:500;white-space:nowrap}
+.bud-tot{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}
+.bud-tot div{border-radius:10px;padding:8px;background:var(--surface2);display:flex;flex-direction:column;font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.bud-tot div b{font-size:15px;color:var(--fg);text-transform:none;letter-spacing:0;font-family:var(--f-head)}
+.bud-tot div.pick{background:var(--accent);color:var(--accent-fg)}
+.bud-tot div.pick b{color:var(--accent-fg)}
+
+/* tracker */
+.kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:640px){.kpis{grid-template-columns:repeat(4,1fr)}}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:2px;box-shadow:var(--shadow)}
+.kpi span{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.07em;text-transform:uppercase}
+.kpi b{font-family:var(--f-head);font-size:20px}
+.kpi.warn b{color:var(--warn)}.kpi.good b{color:var(--good)}
+.proj{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;cursor:pointer;width:100%;text-align:left}
+.proj-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.proj-name{font-weight:600}
+.proj-scope{font-size:13px;color:var(--muted)}
+.pill{flex:none;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.pill.s0{background:var(--water-bg);color:var(--water)}
+.pill.s1{background:var(--warn-bg);color:var(--warn)}
+.pill.s2{background:var(--good-bg);color:var(--good)}
+.pill.s3{background:var(--bad-bg);color:var(--bad)}
+.bar{height:8px;border-radius:99px;background:var(--surface2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.proj-nums{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);gap:8px;flex-wrap:wrap}
+.proj-nums b{color:var(--fg)}
+.bal-due{color:var(--warn)!important}
+.scale{height:6px;border-radius:99px;background:var(--surface2);width:100%}
+.scale i{display:block;height:100%;background:var(--gold);border-radius:99px}
+
+/* bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);z-index:20;
+  padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+.nav-in{max-width:760px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+.nav button{background:none;border:0;min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;position:relative}
+.nav button[aria-current=page]{color:var(--accent)}
+.nav button[aria-current=page]::before{content:"";position:absolute;top:0;width:34px;height:3px;border-radius:0 0 3px 3px;background:var(--gold)}
+.nav svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* sheet + quotation overlays */
+.overlay{position:fixed;inset:0;z-index:40;background:rgba(5,15,12,.55);display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--bg);width:100%;max-width:640px;max-height:92%;border-radius:18px 18px 0 0;display:flex;flex-direction:column;overflow:hidden}
+.sheet-h{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--surface)}
+.sheet-b{padding:14px 16px;overflow:auto;display:flex;flex-direction:column;gap:12px}
+.sheet-f{padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);background:var(--surface);display:flex;gap:8px;flex-wrap:wrap}
+.sheet-f .btn{flex:1 1 110px}
+.paper-wrap{background:var(--surface2);width:100%;height:100%;display:flex;flex-direction:column}
+.paper-bar{display:flex;gap:8px;padding:10px 12px;padding-top:calc(10px + env(safe-area-inset-top,0px));background:var(--surface);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.paper-bar .btn{flex:1 1 90px}
+.paper-scroll{overflow:auto;padding:12px}
+.paper{background:var(--paper);color:var(--paper-fg);max-width:720px;margin:0 auto;border-radius:6px;box-shadow:var(--shadow);overflow:hidden;font-size:13px}
+.paper .lh{background:linear-gradient(100deg,#0e2b3a,#12594b);color:#fff;padding:14px 16px;border-bottom:3px solid #e5a62d}
+.paper .lh b{display:block;font-family:var(--f-head);font-size:18px;text-transform:uppercase;letter-spacing:.01em}
+.paper .lh small{display:block;font-size:11px;color:rgba(255,255,255,.85);margin-top:2px}
+.paper .pb{padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.paper h4{margin:0;font-family:var(--f-head);font-size:15px;letter-spacing:.04em}
+.paper .info{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px}
+.paper .info div{display:flex;flex-direction:column;font-size:12px}
+.paper .info div span{color:#5a6b65;font-size:11px;font-weight:600}
+.paper .tw{overflow-x:auto}
+.paper table{border-collapse:collapse;width:100%;min-width:480px;font-size:12px}
+.paper th{background:#0e2b3a;color:#fff;text-align:left;padding:6px 7px;font-weight:600}
+.paper td{padding:6px 7px;border-bottom:1px solid var(--paper-line);vertical-align:top}
+.paper .r{text-align:right}
+.paper .sum{margin-left:auto;width:min(100%,300px);display:flex;flex-direction:column;gap:4px}
+.paper .sum div{display:flex;justify-content:space-between;gap:10px}
+.paper .sum .g{font-weight:700;font-size:15px;border-top:2px solid #0e2b3a;padding-top:6px;margin-top:2px}
+.paper ol{margin:4px 0 0;padding-left:18px;font-size:12px;color:#33433d}
+.paper .sig{text-align:right;margin-top:18px;font-size:12px}
+.paper .sig b{display:block;margin-top:26px}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(86px + env(safe-area-inset-bottom,0px));background:var(--brand);color:#fff;padding:10px 16px;border-radius:999px;font-size:14px;font-weight:600;z-index:60;max-width:90%;text-align:center;box-shadow:var(--shadow)}
+.note{font-size:12px;color:var(--muted)}
+.empty{padding:22px 12px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px}
+.sample{display:inline-block;font-size:11px;font-weight:700;background:var(--warn-bg);color:var(--warn);padding:2px 8px;border-radius:999px;margin-left:6px}
+@media (prefers-reduced-motion:no-preference){.overlay{animation:fade .15s ease-out}.sheet{animation:up .2s ease-out}}
+@keyframes fade{from{opacity:0}}@keyframes up{from{transform:translateY(24px)}}
+.hbtn{display:flex;gap:6px;flex:none}.gear.txt{width:auto;padding:0 11px;font-weight:700;font-size:13px}
+.qr{display:flex;gap:12px;align-items:center;border:1px solid var(--paper-line);border-radius:8px;padding:10px}
+.qr svg{flex:none;width:96px;height:96px;background:#fff}
+.hint{font-size:12px;color:var(--muted);margin:0}
+.btns .btn.small{flex:0 0 auto}
+</style>
+<script src="lib/jspdf.umd.min.js"></script>
+<script src="lib/jspdf.plugin.autotable.min.js"></script>
+<script src="lib/xlsx.full.min.js"></script>
+<script src="lib/qrcode.js"></script>
+
+<header class="brand"><div class="wrap">
+  <div class="logo" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="#1aa6e8" stroke="none"><path d="M12 2.5c3.4 4.4 6 7.6 6 11a6 6 0 0 1-12 0c0-3.4 2.6-6.6 6-11z"/></svg></div>
+  <div class="brand-main">
+    <h3 id="b-name"></h3>
+    <p id="b-line"></p>
+    <p id="b-addr"></p>
+    <p class="tag" id="b-tag"></p>
+  </div>
+  <div class="hbtn"><button class="gear txt" data-act="lang" id="langbtn" aria-label="Language">ಕನ್ನಡ</button><button class="gear" data-act="settings" aria-label="Business details and backup"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></div>
+</div></header>
+
+<main class="wrap" id="view"></main>
+
+<nav class="nav" aria-label="Sections"><div class="nav-in" id="nav"></div></nav>
+<div id="layer"></div>
+
+<script>
+/* ---------- helpers ---------- */
+const KEY='ssi-irrigation-v1';
+const TIERS=[['eco','Economy'],['std','Standard'],['prem','Premium']];
+const STATUSES=['Quote Sent','In Progress','Completed','Cancelled'];
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num=v=>{const n=parseFloat(v);return isFinite(n)?n:0};
+const fmtN=n=>{n=num(n);return n.toLocaleString('en-IN',{minimumFractionDigits:Number.isInteger(n)?0:2,maximumFractionDigits:2})};
+const inr=n=>'₹'+fmtN(n);
+const rs=n=>'Rs. '+fmtN(n);
+const clone=o=>JSON.parse(JSON.stringify(o));
+const iso=d=>{const z=new Date(d.getTime()-d.getTimezoneOffset()*6e4);return z.toISOString().slice(0,10)};
+const today=()=>iso(new Date());
+const parseD=s=>{const [y,m,d]=String(s).split('-').map(Number);return new Date(y||2026,(m||1)-1,d||1)};
+const fmtD=s=>{if(!s)return'';return parseD(s).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}).replace(/ /g,'-')};
+const addDays=(s,n)=>{const d=parseD(s);d.setDate(d.getDate()+n);return iso(d)};
+const R=(n,dp=0)=>{const f=Math.pow(10,dp);return Math.round(n*f)/f};
+
+/* ---------- seed data (taken from the shop's Excel estimate) ---------- */
+const SEED_ITEMS=[
+['PMP-01','Submersible Pumps','Submersible Pump Set (1.5 HP, 1-Phase)','Set',14500,17500,21000,'Local / Crompton / Texmo'],
+['PMP-02','Submersible Pumps','Submersible Pump Set (3 HP, 3-Phase)','Set',22000,26500,32000,'CRI / Texmo / Kirloskar'],
+['PMP-03','Submersible Pumps','Submersible Pump Set (5 HP, 3-Phase)','Set',31000,36500,44000,'CRI / Texmo / Kirloskar'],
+['PMP-04','Submersible Pumps','Openwell Submersible Pump (2 HP)','Set',13000,15800,19000,'Heavy-duty estate model'],
+['ENG-01','Diesel Engines','Diesel Engine Pump Set (5 HP Air-Cooled)','Set',24000,28500,34000,'Fieldmarshal / Kirloskar'],
+['ENG-02','Diesel Engines','Diesel Engine Pump Set (8 HP Water-Cooled)','Set',32000,38000,45000,'Heavy-duty irrigation'],
+['GEN-01','Generators','Portable Generator (3.5 kVA)','Unit',26000,32000,41000,'Petrol/Diesel backup'],
+['GEN-02','Generators','Agricultural Diesel Generator (7.5 kVA)','Unit',55000,65000,78000,'Single/Three Phase'],
+['HDP-01','HDPE Pipes','HDPE Pipe (50mm / 1.5 inch, 6 kg/cm²)','Meter',48,58,70,'ISI Marked Coil'],
+['HDP-02','HDPE Pipes','HDPE Pipe (63mm / 2 inch, 6 kg/cm²)','Meter',72,85,102,'ISI Marked Coil'],
+['HDP-03','HDPE Pipes','HDPE Pipe (75mm / 2.5 inch, 6 kg/cm²)','Meter',105,122,145,'ISI Marked Coil'],
+['HDP-04','HDPE Pipes','HDPE Pipe (90mm / 3 inch, 6 kg/cm²)','Meter',148,172,205,'ISI Marked Coil'],
+['PVC-01','PVC Pipes','PVC Pipe (50mm / 1.5 inch, 6 kg/cm²)','Meter',55,65,78,'Finolex / Astral / Ashirvad'],
+['PVC-02','PVC Pipes','PVC Pipe (63mm / 2 inch, 6 kg/cm²)','Meter',82,95,112,'Finolex / Astral / Ashirvad'],
+['PVC-03','PVC Pipes','PVC Pipe (90mm / 3 inch, 6 kg/cm²)','Meter',160,185,215,'Finolex / Astral / Ashirvad'],
+['PVC-04','PVC Pipes','Column Pipe for Borewell (1.5 inch Heavy)','Meter',145,175,210,'UPVC Threaded'],
+['ACC-01','Drip & Sprinkler','Drip Lateral Pipe (16mm, 4 LPH Inline)','Meter',8.5,11,14.5,'40cm / 50cm spacing'],
+['ACC-02','Drip & Sprinkler','Sprinkler Nozzle Set with Riser Pipe','Set',320,420,550,'Brass / Heavy Plastic'],
+['ACC-03','Drip & Sprinkler','Screen / Disc Filter (2 inch)','Unit',1400,1850,2400,'120 Mesh Filtration'],
+['ACC-04','Drip & Sprinkler','Venturi Fertilizer Injector Assembly','Set',1100,1450,1900,'With bypass manifold'],
+['VLV-01','Fittings & Valves','Control Valve, Foot Valve & NRV Set','Set',950,1250,1600,'CI / Brass / PVC'],
+['VLV-02','Fittings & Valves','HDPE/PVC Couplers, Elbows & Tees Kit','Lot',1500,2200,3000,'Project fitting bundle'],
+['ELC-01','Electrical','Submersible Flat Cable (3 Core, 2.5 sq.mm)','Meter',68,82,98,'Finolex / Havells Copper'],
+['ELC-02','Electrical','Starter Panel Box (Auto/Manual)','Unit',2400,3200,4200,'With dry-run protection'],
+['SRV-01','Services & Labour','Installation, Trenching & Labour Charges','Job',4500,6500,9000,'Complete site setup'],
+['SRV-02','Services & Labour','Borewell Pump Lowering & Lifting Service','Job',2500,3500,4500,'Chain pulley & crew'],
+['SRV-03','Services & Labour','Pump / Diesel Engine Repair & Overhaul','Service',1200,2000,3200,'Excluding major spares'],
+['SRV-04','Services & Labour','Annual Maintenance & Pipeline Inspection','Visit',1000,1500,2200,'On-site checkup']
+].map(([id,cat,name,unit,eco,std,prem,spec])=>({id,code:id,cat,name,unit,eco,std,prem,spec}));
+
+function seedEstimate(){return{
+  no:'EST-2026-101',date:'2026-11-13',validDays:15,tier:'std',
+  client:'Sri Manjunatha Coffee Estate',site:'Bage Post, Sakleshpur Tq.',phone:'+91 98450 XXXXX',projectType:'Coffee Estate Sprinkler & Borewell Pump',
+  lines:[['PMP-02',1],['HDP-02',180],['PVC-02',60],['ACC-02',15],['VLV-01',2],['ELC-01',90],['ELC-02',1],['SRV-01',1]].map(([item,qty])=>({item,qty})),
+  transport:1500,discount:0,gst:0,subsidy:0}}
+
+function seedState(){
+  const est=seedEstimate();
+  return{v:1,tab:'estimate',lang:'en',
+  biz:{name:'Sri Siddalingeshwara Irrigation',owner:'B.M. Siddesh',phones:'9731352670 | 9739538000',address:'BAGE - 573214, Sakleshpur Tq., Hassan Dist.',
+    tagline:'Submersible Pumps • Diesel Engines • Generators • HDPE & PVC Pipes | Sales & Service',defTransport:1500,defValid:15,upi:'',advPct:50,
+    terms:['Payment Terms: 50% advance with order; 50% upon material delivery & commissioning.','Quotation Validity: {days} days from estimate date (subject to market pipe/copper fluctuations).','Warranty: Standard manufacturer warranty on Pumps, Diesel Engines & Generators.']},
+  items:SEED_ITEMS,est,
+  calc:{area:5,depth:220,main:180,spacing:12,drip:3,cable:90},
+  projects:[
+   ['EST-2026-094','2026-10-12','H.K. Ramesh Gowda','Belagodu','5 HP Submersible & HDPE Line',78500,78500,'Completed'],
+   ['EST-2026-095','2026-10-19','Green Hills Coffee Estate','Hanbal','Sprinkler Network & 8 HP Diesel',112000,80000,'In Progress'],
+   ['EST-2026-096','2026-10-25','Suresh Shetty','Arehalli','Drip Irrigation (4 Acres)',64000,64000,'Completed'],
+   ['EST-2026-097','2026-11-01','Malnad Pepper Farm','Bage','Borewell Lowering & 3 HP Pump',45500,25000,'In Progress'],
+   ['EST-2026-098','2026-11-05','Prakash Hegde','Sakleshpur','7.5 kVA Generator & Panel',68000,68000,'Completed'],
+   ['EST-2026-099','2026-11-09','Kaveri Estate','Yeslur','PVC Mainline & Valve Overhaul',34000,15000,'In Progress'],
+   ['EST-2026-100','2026-11-11','Nagaraj B.S.','Changadihalli','Openwell Pump & Cable Setup',24500,0,'Quote Sent']
+  ].map(([id,date,client,village,scope,quoted,paid,status])=>({id,date,client,village,scope,quoted,paid,status})).concat([
+   {id:est.no,date:est.date,client:est.client,village:'Bage Post',scope:'Coffee Estate Sprinkler & Pump',quoted:74880,paid:25000,status:'Quote Sent',snap:clone(est)}]),
+  sample:true}}
+
+let S;
+try{S=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){S=null}
+if(!S||!S.est||!S.items)S=seedState();
+S.lang=S.lang||'en';S.biz.upi=S.biz.upi||'';if(S.biz.advPct==null)S.biz.advPct=50;if(S.est.subsidy==null)S.est.subsidy=0;S.projects.forEach(q=>{if(q.phone==null)q.phone=''});
+let saveT;
+function persist(){clearTimeout(saveT);saveT=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}},250)}
+
+/* ---------- calculations (same formulas as the Excel sheets) ---------- */
+const itemById=id=>S.items.find(i=>i.id===id);
+const itemByCode=c=>S.items.find(i=>i.code===c);
+const lineRate=l=>{const it=itemById(l.item);const f=S.est.frozen&&S.est.frozen[l.item];return f?num(f[S.est.tier]):(it?num(it[S.est.tier]):0)};
+const lineAmt=l=>itemById(l.item)?num(l.qty)*lineRate(l):0;
+function totals(){const e=S.est;const sub=e.lines.reduce((a,l)=>a+lineAmt(l),0);const gst=sub*num(e.gst)/100;
+  const grand=sub+num(e.transport)-num(e.discount)+gst;const subsidy=grand*Math.min(100,Math.max(0,num(e.subsidy)))/100;const payable=grand-subsidy;
+  return{sub,gst,grand,subsidy,payable,adv:payable*num(S.biz.advPct)/100}}
+function calc(){const c=S.calc,a=num(c.area);
+  return{pump:a<=2?'1.5 HP - 2 HP':a<=5?'3 HP (3-Phase)':'5 HP - 7.5 HP',
+   column:Math.ceil(num(c.depth)*0.3048),main:Math.ceil(num(c.main)*1.1),
+   spr:num(c.spacing)>0?Math.ceil(a*4047/(num(c.spacing)**2)):0,
+   drip:num(c.drip)>0?Math.ceil(a*4047/num(c.drip)):0,cable:Math.ceil(num(c.cable)*1.05)}}
+const BUDGET=[['PMP-02','Submersible Pump Set (3 HP)',()=>1],['HDP-02','HDPE Mainline Pipe (63mm)',c=>c.main],['PVC-04','Column Pipe (1.5 inch Heavy)',c=>c.column],
+  ['ACC-02','Sprinkler Nozzle & Riser Sets',c=>c.spr],['ELC-01','Submersible Copper Cable',c=>c.cable],['SRV-01','Installation & Labour',()=>1]];
+function budget(){const c=calc();const rows=BUDGET.map(([code,label,q])=>{const it=itemByCode(code);const qty=q(c);
+  return{code,label,qty,unit:it?it.unit:'',it,eco:it?it.eco*qty:0,std:it?it.std*qty:0,prem:it?it.prem*qty:0}});
+  return{rows,tot:{eco:rows.reduce((a,r)=>a+r.eco,0),std:rows.reduce((a,r)=>a+r.std,0),prem:rows.reduce((a,r)=>a+r.prem,0)}}}
+const projTotals=()=>{const p=S.projects.filter(x=>x.status!=='Cancelled');const q=p.reduce((a,x)=>a+num(x.quoted),0),r=p.reduce((a,x)=>a+num(x.paid),0);
+  return{quoted:q,paid:r,pending:q-r,done:S.projects.filter(x=>x.status==='Completed').length}};
+function blankEst(){return{no:nextNo(),date:today(),validDays:S.biz.defValid,tier:S.est.tier,client:'',site:'',phone:'',projectType:'',lines:[{item:'',qty:1}],transport:S.biz.defTransport,discount:0,gst:0,subsidy:0}}
+function nextNo(){const y=new Date().getFullYear();let m=0;[...S.projects.map(p=>p.id),S.est.no].forEach(id=>{const k=/^EST-(\d{4})-(\d+)$/.exec(id||'');if(k&&+k[1]===y)m=Math.max(m,+k[2])});
+  return`EST-${y}-${String(m+1).padStart(3,'0')}`}
+const validUntil=()=>addDays(S.est.date,num(S.est.validDays));
+const termsList=()=>S.biz.terms.filter(t=>t.trim()).map(t=>t.replace(/\{days\}/g,S.est.validDays));
+
+/* ---------- Kannada / English ---------- */
+const KN={'Estimate':'ಅಂದಾಜು','Prices':'ಬೆಲೆ ಪಟ್ಟಿ','Calculator':'ಕ್ಯಾಲ್ಕುಲೇಟರ್','Projects':'ಕೆಲಸಗಳು',
+'Client Estimate':'ಗ್ರಾಹಕರ ಅಂದಾಜು ಪತ್ರ','Fill in the client and pick items. Rates fill in by price tier.':'ಗ್ರಾಹಕರ ವಿವರ ತುಂಬಿ, ಸಾಮಗ್ರಿ ಆಯ್ಕೆಮಾಡಿ. ದರ ಬೆಲೆ ವರ್ಗದಂತೆ ತುಂಬುತ್ತದೆ.',
+'Client & site':'ಗ್ರಾಹಕ ಮತ್ತು ಸ್ಥಳ','Client name':'ಗ್ರಾಹಕರ ಹೆಸರು','Village / site':'ಗ್ರಾಮ / ಸ್ಥಳ','Contact no.':'ಸಂಪರ್ಕ ಸಂಖ್ಯೆ','Project type':'ಕೆಲಸದ ವಿಧ',
+'Quotation':'ಕೊಟೇಶನ್','Estimate no.':'ಅಂದಾಜು ಸಂಖ್ಯೆ','Estimate date':'ಅಂದಾಜು ದಿನಾಂಕ','Valid for (days)':'ಮಾನ್ಯತೆ (ದಿನಗಳು)','Valid until':'ಮಾನ್ಯತೆ ಅಂತ್ಯ','Price tier':'ಬೆಲೆ ವರ್ಗ',
+'Economy':'ಎಕಾನಮಿ','Standard':'ಸ್ಟ್ಯಾಂಡರ್ಡ್','Premium':'ಪ್ರೀಮಿಯಂ','Items & services':'ಸಾಮಗ್ರಿ ಮತ್ತು ಸೇವೆಗಳು','— Select item —':'— ಸಾಮಗ್ರಿ ಆಯ್ಕೆಮಾಡಿ —',
+'Qty':'ಪ್ರಮಾಣ','Rate':'ದರ','Amount':'ಮೊತ್ತ','+ Add item':'+ ಸಾಮಗ್ರಿ ಸೇರಿಸಿ','No items yet. Tap “Add item”.':'ಇನ್ನೂ ಸಾಮಗ್ರಿ ಇಲ್ಲ. “ಸಾಮಗ್ರಿ ಸೇರಿಸಿ” ಒತ್ತಿ.',
+'Subtotal (materials & services)':'ಉಪ ಮೊತ್ತ (ಸಾಮಗ್ರಿ ಮತ್ತು ಸೇವೆ)','Site delivery & transport (₹)':'ಸಾಗಣೆ ಶುಲ್ಕ (₹)','Special discount (₹)':'ವಿಶೇಷ ರಿಯಾಯಿತಿ (₹)',
+'GST / tax (%)':'ಜಿಎಸ್‌ಟಿ / ತೆರಿಗೆ (%)','GST amount':'ಜಿಎಸ್‌ಟಿ ಮೊತ್ತ','Govt. subsidy (%)':'ಸರ್ಕಾರಿ ಸಹಾಯಧನ (%)','Govt. subsidy':'ಸರ್ಕಾರಿ ಸಹಾಯಧನ','Farmer pays':'ರೈತರು ಪಾವತಿಸಬೇಕಾದ ಮೊತ್ತ',
+'Use the subsidy only if the farmer is claiming a micro-irrigation subsidy. Check the current rate with the Horticulture department.':'ರೈತರು ಸೂಕ್ಷ್ಮ ನೀರಾವರಿ ಸಹಾಯಧನ ಪಡೆಯುವುದಾದರೆ ಮಾತ್ರ ಬಳಸಿ. ಪ್ರಸ್ತುತ ದರವನ್ನು ತೋಟಗಾರಿಕೆ ಇಲಾಖೆಯಲ್ಲಿ ಪರಿಶೀಲಿಸಿ.',
+'Advance to confirm order':'ಆರ್ಡರ್ ದೃಢಪಡಿಸಲು ಮುಂಗಡ','Grand total estimate':'ಒಟ್ಟು ಅಂದಾಜು ಮೊತ್ತ','Save to Projects':'ಕೆಲಸಗಳಿಗೆ ಉಳಿಸಿ','View quotation':'ಕೊಟೇಶನ್ ನೋಡಿ',
+'Share PDF':'PDF ಹಂಚಿ','New estimate':'ಹೊಸ ಅಂದಾಜು','Tap again: start blank':'ಖಾಲಿ ಪ್ರಾರಂಭಿಸಲು ಮತ್ತೆ ಒತ್ತಿ','Use today’s prices':'ಇಂದಿನ ಬೆಲೆ ಬಳಸಿ',
+'This estimate uses the prices from when it was saved.':'ಈ ಅಂದಾಜು ಉಳಿಸಿದ ಸಮಯದ ಬೆಲೆಗಳನ್ನು ಬಳಸುತ್ತಿದೆ.',
+'Item Price List':'ಸಾಮಗ್ರಿ ಬೆಲೆ ಪಟ್ಟಿ','Three price tiers per item. Tap an item to change its prices.':'ಪ್ರತಿ ಸಾಮಗ್ರಿಗೆ ಮೂರು ಬೆಲೆ ವರ್ಗಗಳು. ಬೆಲೆ ಬದಲಿಸಲು ಸಾಮಗ್ರಿ ಒತ್ತಿ.',
+'+ New item':'+ ಹೊಸ ಸಾಮಗ್ರಿ','Adjust prices':'ಬೆಲೆ ಬದಲಾವಣೆ','All':'ಎಲ್ಲಾ','Search item, code or brand':'ಸಾಮಗ್ರಿ, ಕೋಡ್ ಅಥವಾ ಬ್ರಾಂಡ್ ಹುಡುಕಿ','No items match. Try another word.':'ಯಾವುದೂ ಸಿಗಲಿಲ್ಲ. ಬೇರೆ ಪದ ಪ್ರಯತ್ನಿಸಿ.',
+'Save':'ಉಳಿಸಿ','Delete':'ಅಳಿಸಿ','Close':'ಮುಚ್ಚಿ','Apply':'ಅನ್ವಯಿಸಿ','Edit item':'ಸಾಮಗ್ರಿ ತಿದ್ದಿ','New item':'ಹೊಸ ಸಾಮಗ್ರಿ','Tap again to delete':'ಅಳಿಸಲು ಮತ್ತೆ ಒತ್ತಿ','Tap again to apply':'ಅನ್ವಯಿಸಲು ಮತ್ತೆ ಒತ್ತಿ',
+'Item code':'ಸಾಮಗ್ರಿ ಕೋಡ್','Category':'ವರ್ಗ','Item / service description':'ಸಾಮಗ್ರಿ / ಸೇವೆಯ ವಿವರ','Brand / technical spec':'ಬ್ರಾಂಡ್ / ತಾಂತ್ರಿಕ ವಿವರ',
+'Change in % (e.g. 5 or -3)':'ಬದಲಾವಣೆ % (ಉದಾ: 5 ಅಥವಾ -3)','All categories':'ಎಲ್ಲಾ ವರ್ಗಗಳು','All three tiers':'ಮೂರೂ ಬೆಲೆ ವರ್ಗಗಳು',
+'Irrigation Calculator':'ನೀರಾವರಿ ಕ್ಯಾಲ್ಕುಲೇಟರ್','Enter the farm details. Quantities and a quick budget appear below.':'ತೋಟದ ವಿವರ ನಮೂದಿಸಿ. ಪ್ರಮಾಣ ಮತ್ತು ಬಜೆಟ್ ಕೆಳಗೆ ಕಾಣುತ್ತದೆ.',
+'Farm / estate site':'ತೋಟ / ಎಸ್ಟೇಟ್ ವಿವರ','Land area (acres)':'ಜಮೀನು ವಿಸ್ತೀರ್ಣ (ಎಕರೆ)','Borewell depth (feet)':'ಕೊಳವೆ ಬಾವಿ ಆಳ (ಅಡಿ)','Mainline distance, source to field (m)':'ಮುಖ್ಯ ಪೈಪ್ ದೂರ, ಮೂಲದಿಂದ ಜಮೀನಿಗೆ (ಮೀ)',
+'Sprinkler spacing (m × m)':'ಸ್ಪ್ರಿಂಕ್ಲರ್ ಅಂತರ (ಮೀ × ಮೀ)','Drip lateral row spacing (m)':'ಡ್ರಿಪ್ ಸಾಲು ಅಂತರ (ಮೀ)','Cable run, panel to borewell (m)':'ಕೇಬಲ್ ಉದ್ದ, ಪ್ಯಾನೆಲ್‌ನಿಂದ ಬಾವಿಗೆ (ಮೀ)',
+'Required material':'ಬೇಕಾದ ಸಾಮಗ್ರಿ','Recommended submersible pump':'ಶಿಫಾರಸು ಮಾಡಿದ ಸಬ್ಮರ್ಸಿಬಲ್ ಪಂಪ್','Column pipe needed':'ಬೇಕಾದ ಕಾಲಮ್ ಪೈಪ್','Mainline HDPE/PVC pipe (incl. 10% wastage)':'ಮುಖ್ಯ HDPE/PVC ಪೈಪ್ (10% ವ್ಯರ್ಥ ಸೇರಿ)',
+'Sprinkler sets required':'ಬೇಕಾದ ಸ್ಪ್ರಿಂಕ್ಲರ್ ಸೆಟ್','Drip lateral pipe (if drip)':'ಡ್ರಿಪ್ ಲ್ಯಾಟರಲ್ ಪೈಪ್ (ಡ್ರಿಪ್ ಆದರೆ)','Submersible copper cable (incl. 5%)':'ಸಬ್ಮರ್ಸಿಬಲ್ ತಾಮ್ರದ ಕೇಬಲ್ (5% ಸೇರಿ)',
+'Quick budget by price tier':'ಬೆಲೆ ವರ್ಗದಂತೆ ತ್ವರಿತ ಬಜೆಟ್','Add these items to the estimate':'ಈ ಸಾಮಗ್ರಿಗಳನ್ನು ಅಂದಾಜಿಗೆ ಸೇರಿಸಿ','Total':'ಒಟ್ಟು',
+'Submersible Pump Set (3 HP)':'ಸಬ್ಮರ್ಸಿಬಲ್ ಪಂಪ್ ಸೆಟ್ (3 HP)','HDPE Mainline Pipe (63mm)':'HDPE ಮುಖ್ಯ ಪೈಪ್ (63mm)','Column Pipe (1.5 inch Heavy)':'ಕಾಲಮ್ ಪೈಪ್ (1.5 ಇಂಚು)','Sprinkler Nozzle & Riser Sets':'ಸ್ಪ್ರಿಂಕ್ಲರ್ ನಾಝಲ್ ಮತ್ತು ರೈಸರ್','Submersible Copper Cable':'ಸಬ್ಮರ್ಸಿಬಲ್ ತಾಮ್ರದ ಕೇಬಲ್','Installation & Labour':'ಅಳವಡಿಕೆ ಮತ್ತು ಕೂಲಿ',
+'Project & Payment Tracker':'ಕೆಲಸ ಮತ್ತು ಪಾವತಿ ಟ್ರ್ಯಾಕರ್','Cancelled quotes are left out of the totals.':'ರದ್ದಾದ ಕೊಟೇಶನ್‌ಗಳನ್ನು ಒಟ್ಟು ಮೊತ್ತದಿಂದ ಹೊರಗಿಡಲಾಗಿದೆ.','+ New':'+ ಹೊಸದು','sample data':'ಮಾದರಿ ಮಾಹಿತಿ',
+'Total quoted':'ಒಟ್ಟು ಕೊಟೇಶನ್','Received':'ಸ್ವೀಕರಿಸಿದ್ದು','Pending balance':'ಬಾಕಿ ಮೊತ್ತ','Completed':'ಪೂರ್ಣಗೊಂಡಿದ್ದು','Quote Sent':'ಕೊಟೇಶನ್ ಕಳುಹಿಸಲಾಗಿದೆ','In Progress':'ಪ್ರಗತಿಯಲ್ಲಿದೆ','Cancelled':'ರದ್ದಾಗಿದೆ',
+'Quoted':'ಕೊಟೇಶನ್','Paid':'ಪಾವತಿ','Balance':'ಬಾಕಿ','Follow up':'ಫಾಲೋ ಅಪ್','Edit project':'ಕೆಲಸ ತಿದ್ದಿ','New project':'ಹೊಸ ಕೆಲಸ','Quote ID':'ಕೊಟೇಶನ್ ಸಂಖ್ಯೆ','Date':'ದಿನಾಂಕ',
+'Client / estate name':'ಗ್ರಾಹಕ / ಎಸ್ಟೇಟ್ ಹೆಸರು','Client phone':'ಗ್ರಾಹಕರ ಫೋನ್','Village / location':'ಗ್ರಾಮ / ಸ್ಥಳ','Work scope':'ಕೆಲಸದ ವಿವರ','Quoted amount ₹':'ಕೊಟೇಶನ್ ಮೊತ್ತ ₹','Amount paid ₹':'ಪಾವತಿಸಿದ ಮೊತ್ತ ₹',
+'Add a payment received ₹':'ಬಂದ ಪಾವತಿ ಸೇರಿಸಿ ₹','Add to paid':'ಪಾವತಿಗೆ ಸೇರಿಸಿ','Status':'ಸ್ಥಿತಿ','WhatsApp reminder for balance':'ಬಾಕಿಗೆ WhatsApp ನೆನಪೋಲೆ','Open estimate':'ಅಂದಾಜು ತೆರೆಯಿರಿ','Copy to new estimate':'ಹೊಸ ಅಂದಾಜಿಗೆ ನಕಲಿಸಿ',
+'Business details & backup':'ವ್ಯಾಪಾರ ವಿವರ ಮತ್ತು ಬ್ಯಾಕಪ್','Business name':'ವ್ಯಾಪಾರದ ಹೆಸರು','Proprietor':'ಮಾಲೀಕರು','Phone numbers':'ಫೋನ್ ಸಂಖ್ಯೆಗಳು','Address':'ವಿಳಾಸ','Services line':'ಸೇವೆಗಳ ಸಾಲು',
+'Default transport ₹':'ಸಾಮಾನ್ಯ ಸಾಗಣೆ ₹','Default validity (days)':'ಸಾಮಾನ್ಯ ಮಾನ್ಯತೆ (ದಿನ)','UPI ID (QR on quotations)':'UPI ಐಡಿ (ಕೊಟೇಶನ್‌ನಲ್ಲಿ QR)','Advance to confirm order (%)':'ಆರ್ಡರ್ ದೃಢಪಡಿಸಲು ಮುಂಗಡ (%)',
+'Save details':'ವಿವರ ಉಳಿಸಿ','Backup & data':'ಬ್ಯಾಕಪ್ ಮತ್ತು ಮಾಹಿತಿ','Save backup':'ಬ್ಯಾಕಪ್ ಉಳಿಸಿ','Restore backup':'ಬ್ಯಾಕಪ್ ಮರುಸ್ಥಾಪಿಸಿ','All data to Excel':'ಎಲ್ಲಾ ಮಾಹಿತಿ Excel ಗೆ','Install app on this phone':'ಈ ಫೋನ್‌ನಲ್ಲಿ ಆ್ಯಪ್ ಇನ್‌ಸ್ಟಾಲ್ ಮಾಡಿ',
+'Clear sample data (start fresh)':'ಮಾದರಿ ಮಾಹಿತಿ ಅಳಿಸಿ (ಹೊಸದಾಗಿ ಪ್ರಾರಂಭ)','Tap again to remove':'ಅಳಿಸಲು ಮತ್ತೆ ಒತ್ತಿ',
+'QUOTATION / ESTIMATE':'ಕೊಟೇಶನ್ / ಅಂದಾಜು','Client':'ಗ್ರಾಹಕರು','Contact':'ಸಂಪರ್ಕ','Project':'ಕೆಲಸ','Item / service':'ಸಾಮಗ್ರಿ / ಸೇವೆ','Unit':'ಘಟಕ','Subtotal':'ಉಪ ಮೊತ್ತ','Transport':'ಸಾಗಣೆ','Discount':'ರಿಯಾಯಿತಿ','GRAND TOTAL':'ಒಟ್ಟು ಮೊತ್ತ',
+'TERMS & WARRANTY NOTES':'ನಿಯಮಗಳು ಮತ್ತು ವಾರಂಟಿ','Copy text':'ಪಠ್ಯ ನಕಲಿಸಿ','Scan to pay the advance by UPI':'ಮುಂಗಡವನ್ನು UPI ಮೂಲಕ ಪಾವತಿಸಲು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ','No items added.':'ಯಾವುದೇ ಸಾಮಗ್ರಿ ಸೇರಿಸಿಲ್ಲ.',
+'Saved to Projects':'ಕೆಲಸಗಳಿಗೆ ಉಳಿಸಲಾಗಿದೆ','Project updated':'ಕೆಲಸ ನವೀಕರಿಸಲಾಗಿದೆ','Project saved':'ಕೆಲಸ ಉಳಿಸಲಾಗಿದೆ','Item saved':'ಸಾಮಗ್ರಿ ಉಳಿಸಲಾಗಿದೆ','Details saved':'ವಿವರ ಉಳಿಸಲಾಗಿದೆ','Copied':'ನಕಲಿಸಲಾಗಿದೆ','Now using today’s prices':'ಇಂದಿನ ಬೆಲೆ ಬಳಸಲಾಗುತ್ತಿದೆ','Backup restored':'ಬ್ಯಾಕಪ್ ಮರುಸ್ಥಾಪಿಸಲಾಗಿದೆ'};
+const tr=x=>(S.lang==='kn'&&KN[x])||x;
+function translateDom(root){if(!root||S.lang!=='kn')return;const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);const list=[];let n;while((n=w.nextNode()))list.push(n);
+  list.forEach(n=>{const k=n.nodeValue.trim();if(k&&KN[k])n.nodeValue=n.nodeValue.replace(k,KN[k])});
+  root.querySelectorAll('[placeholder],[aria-label],[title]').forEach(el=>['placeholder','aria-label','title'].forEach(a=>{const v=el.getAttribute(a);if(v&&KN[v])el.setAttribute(a,KN[v])}))}
+let DP=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();DP=e});
+
+/* ---------- file saving (works in claude.ai viewer and as a plain file) ---------- */
+async function saveFile(filename,data,mime){
+  try{const d=window.claude&&window.claude.use?await window.claude.use('downloads'):null;
+    if(d){await d.save({filename,data});toast('Saved '+filename);return}}
+  catch(e){if(e&&e.code==='declined'){toast('Save cancelled');return}}
+  try{const blob=data instanceof Blob?data:new Blob([data],{type:mime||'application/octet-stream'});const u=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=u;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);toast('Saved '+filename)}
+  catch(e){toast('Could not save the file here')}}
+let toastT;function toast(m){$('.toast')?.remove();const t=document.createElement('div');t.className='toast';t.setAttribute('role','status');t.textContent=tr(m);document.body.appendChild(t);clearTimeout(toastT);toastT=setTimeout(()=>t.remove(),2600)}
+
+/* ---------- exports ---------- */
+function setF(ws,addr,f,v){ws[addr]={t:'n',f,v}}
+function estSheetData(){const e=S.est,B=S.biz,t=totals();
+  const rows=[[B.name.toUpperCase()],['Prop: '+B.owner+'  |  Ph: '+B.phones],[B.address],[B.tagline],[],
+   ['CLIENT & SITE INFORMATION','','','QUOTATION / ESTIMATE SUMMARY'],
+   ['Client Name:',e.client,'','Estimate No.:',e.no],['Village / Site:',e.site,'','Estimate Date:',fmtD(e.date)],
+   ['Contact No.:',e.phone,'','Valid Until:',fmtD(validUntil())],['Project Type:',e.projectType,'','Selected Price Tier:',TIERS.find(x=>x[0]===e.tier)[1]],[],
+   ['S.No','Item / Service Description','Category','Unit','Qty','Unit Rate (₹)','Total Amount (₹)']];
+  const first=rows.length+1;
+  e.lines.forEach((l,i)=>{const it=itemById(l.item);if(!it)return;rows.push([i+1,it.name,it.cat,it.unit,num(l.qty),lineRate(l),lineAmt(l)])});
+  const last=rows.length;const r=n=>rows.length+n;
+  const sumRow=r(1);rows.push(['Subtotal (Materials & Services)','','','','','',t.sub]);
+  rows.push(['Site Delivery & Transport Charges','','','','','',num(e.transport)]);
+  rows.push(['Special Discount (if applicable)','','','','','',num(e.discount)]);
+  rows.push(['GST / Tax (%)','','','','',num(e.gst),t.gst]);
+  rows.push(['GRAND TOTAL ESTIMATE (₹)','','','','','',t.grand]);rows.push([]);rows.push(['TERMS & WARRANTY NOTES:']);
+  termsList().forEach((x,i)=>rows.push([(i+1)+'. '+x]));rows.push([]);rows.push(['For '+B.name.toUpperCase()]);rows.push(['Authorized Signatory — '+B.owner]);
+  const ws=XLSX.utils.aoa_to_sheet(rows);
+  for(let k=first;k<=last;k++)if(ws['G'+k])setF(ws,'G'+k,`E${k}*F${k}`,ws['G'+k].v);
+  if(last>=first){setF(ws,'G'+sumRow,`SUM(G${first}:G${last})`,t.sub)}
+  setF(ws,'G'+(sumRow+3),`G${sumRow}*F${sumRow+3}/100`,t.gst);
+  setF(ws,'G'+(sumRow+4),`G${sumRow}+G${sumRow+1}-G${sumRow+2}+G${sumRow+3}`,t.grand);
+  ws['!cols']=[{wch:8},{wch:46},{wch:20},{wch:9},{wch:10},{wch:14},{wch:17}];return ws}
+function xlsxBytes(wb){return XLSX.write(wb,{type:'array',bookType:'xlsx'})}
+function exportEstimateXlsx(){if(!window.XLSX)return toast('Excel tool did not load. Check internet once.');
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,estSheetData(),'Client Estimate');
+  saveFile(`${S.est.no}-${(S.est.client||'estimate').replace(/[^\w]+/g,'_')}.xlsx`,xlsxBytes(wb))}
+function exportAllXlsx(){if(!window.XLSX)return toast('Excel tool did not load. Check internet once.');
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,estSheetData(),'Client Estimate');
+  const pr=[['Item Code','Category','Item / Service Description','Unit','Economy','Standard','Premium','Brand / Technical Spec','Price Spread']];
+  S.items.forEach(i=>pr.push([i.code,i.cat,i.name,i.unit,num(i.eco),num(i.std),num(i.prem),i.spec,num(i.prem)-num(i.eco)]));
+  const ps=XLSX.utils.aoa_to_sheet(pr);S.items.forEach((i,k)=>setF(ps,'I'+(k+2),`G${k+2}-E${k+2}`,num(i.prem)-num(i.eco)));
+  ps['!cols']=[{wch:9},{wch:18},{wch:46},{wch:8},{wch:10},{wch:10},{wch:10},{wch:28},{wch:12}];XLSX.utils.book_append_sheet(wb,ps,'Item Price List');
+  const tr=[['Quote ID','Date','Client / Estate Name','Village / Location','Work Scope','Quoted Amount (₹)','Amount Paid (₹)','Balance Due (₹)','Project Status']];
+  S.projects.forEach(p=>tr.push([p.id,fmtD(p.date),p.client,p.village,p.scope,num(p.quoted),num(p.paid),num(p.quoted)-num(p.paid),p.status]));
+  const ts=XLSX.utils.aoa_to_sheet(tr);S.projects.forEach((p,k)=>setF(ts,'H'+(k+2),`F${k+2}-G${k+2}`,num(p.quoted)-num(p.paid)));
+  ts['!cols']=[{wch:14},{wch:12},{wch:28},{wch:18},{wch:34},{wch:16},{wch:15},{wch:15},{wch:14}];XLSX.utils.book_append_sheet(wb,ts,'Project & Payment Tracker');
+  saveFile(`Siddalingeshwara-Irrigation-${today()}.xlsx`,xlsxBytes(wb))}
+
+function buildPDF(){const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:'mm',format:'a4'});const W=210,m=14,B=S.biz,e=S.est,t=totals();
+  doc.setFillColor(14,43,58);doc.rect(0,0,W,36,'F');doc.setFillColor(229,166,45);doc.rect(0,0,W,1.6,'F');doc.rect(0,36,W,1.2,'F');
+  doc.setTextColor(255);doc.setFont('helvetica','bold');doc.setFontSize(17);doc.text(B.name.toUpperCase(),m,14);
+  doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.text(`Prop: ${B.owner}   |   Ph: ${B.phones}`,m,20.5);doc.text(B.address,m,25.5);
+  doc.setTextColor(245,200,100);doc.text(doc.splitTextToSize(B.tagline.replace(/•/g,'-'),W-2*m)[0],m,31);
+  doc.setTextColor(20,32,28);doc.setFont('helvetica','bold');doc.setFontSize(12);doc.text('QUOTATION / ESTIMATE',m,47);
+  doc.setFontSize(9);const info=(x,y,k,v)=>{doc.setFont('helvetica','normal');doc.setTextColor(90,107,101);doc.text(k,x,y);doc.setFont('helvetica','bold');doc.setTextColor(20,32,28);doc.text(String(v||'-'),x+27,y)};
+  info(m,54,'Client:',e.client);info(m,59.5,'Village / Site:',e.site);info(m,65,'Contact:',e.phone);info(m,70.5,'Project:',doc.splitTextToSize(e.projectType||'-',62)[0]);
+  info(112,54,'Estimate No.:',e.no);info(112,59.5,'Date:',fmtD(e.date));info(112,65,'Valid Until:',fmtD(validUntil()));info(112,70.5,'Price Tier:',TIERS.find(x=>x[0]===e.tier)[1]);
+  const body=[];e.lines.forEach(l=>{const it=itemById(l.item);if(it)body.push([body.length+1,it.name.replace(/²/g,'2'),it.unit,num(l.qty).toLocaleString('en-IN'),rs(lineRate(l)),rs(lineAmt(l))])});
+  doc.autoTable({startY:76,head:[['S.No','Item / Service Description','Unit','Qty','Unit Rate','Amount']],body,theme:'grid',
+    headStyles:{fillColor:[14,43,58],textColor:255,fontSize:8.5},styles:{fontSize:8.5,cellPadding:2,lineColor:[201,211,206],textColor:[20,32,28]},
+    columnStyles:{0:{cellWidth:12,halign:'center'},2:{cellWidth:16},3:{cellWidth:16,halign:'right'},4:{cellWidth:26,halign:'right'},5:{cellWidth:30,halign:'right'}},margin:{left:m,right:m}});
+  let y=doc.lastAutoTable.finalY+6;const need=(h)=>{if(y+h>285){doc.addPage();y=18}};
+  const row=(k,v,bold)=>{need(7);doc.setFont('helvetica',bold?'bold':'normal');doc.setFontSize(bold?11:9);doc.setTextColor(20,32,28);doc.text(k,120,y);doc.text(v,W-m,y,{align:'right'});y+=bold?8:5.5};
+  row('Subtotal (Materials & Services)',rs(t.sub));row('Site Delivery & Transport',rs(e.transport));
+  if(num(e.discount))row('Special Discount','- '+rs(e.discount));if(num(e.gst))row(`GST / Tax (${e.gst}%)`,rs(t.gst));
+  doc.setDrawColor(14,43,58);doc.setLineWidth(.5);doc.line(120,y-3,W-m,y-3);row('GRAND TOTAL',rs(t.grand),true);
+  if(t.subsidy>0){row(`Govt. subsidy (${e.subsidy}%)`,'- '+rs(t.subsidy));row('Farmer pays',rs(t.payable),true)}
+  row(`Advance (${S.biz.advPct}%)`,rs(t.adv));
+  if(B.upi){const qm=qrModules(upiUri(t.adv));if(qm){need(40);y+=3;const sz=30,cell=sz/qm.n;doc.setFillColor(0,0,0);
+    for(let r=0;r<qm.n;r++)for(let c=0;c<qm.n;c++)if(qm.dark(r,c))doc.rect(m+c*cell,y+r*cell,cell+.02,cell+.02,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(20,32,28);doc.text('Scan to pay the advance by UPI',m+sz+5,y+9);doc.setFont('helvetica','normal');doc.text(B.upi,m+sz+5,y+15);doc.text(rs(t.adv),m+sz+5,y+21);y+=sz+2}}
+  y+=4;need(30);doc.setFont('helvetica','bold');doc.setFontSize(9);doc.text('TERMS & WARRANTY NOTES:',m,y);y+=5;doc.setFont('helvetica','normal');doc.setFontSize(8.5);
+  termsList().forEach((x,i)=>{const ls=doc.splitTextToSize(`${i+1}. ${x}`,W-2*m);need(ls.length*4.2);doc.text(ls,m,y);y+=ls.length*4.2+1});
+  need(32);y+=6;doc.setFont('helvetica','normal');doc.text('For '+B.name.toUpperCase(),W-m,y,{align:'right'});y+=18;doc.setFont('helvetica','bold');doc.text('Authorized Signatory - '+B.owner,W-m,y,{align:'right'});
+  return doc.output('arraybuffer')}
+function exportPDF(){if(!(window.jspdf&&window.jspdf.jsPDF))return toast('PDF tool did not load. Check internet once.');
+  try{saveFile(`${S.est.no}-${(S.est.client||'estimate').replace(/[^\w]+/g,'_')}.pdf`,buildPDF())}catch(err){toast('Could not build the PDF')}}
+
+function shareText(){const e=S.est,B=S.biz,t=totals();const L=[`*${B.name.toUpperCase()}*`,`Prop: ${B.owner} | Ph: ${B.phones}`,B.address,'',`*QUOTATION ${e.no}*`,`Date: ${fmtD(e.date)}  |  Valid until: ${fmtD(validUntil())}`,`Client: ${e.client}`,`Site: ${e.site}`,...(e.projectType?[`Work: ${e.projectType}`]:[]),''];
+  let n=0;e.lines.forEach(l=>{const it=itemById(l.item);if(!it)return;n++;L.push(`${n}. ${it.name} - ${num(l.qty)} ${it.unit} x ${rs(lineRate(l))} = ${rs(lineAmt(l))}`)});
+  L.push('',`Subtotal: ${rs(t.sub)}`,`Transport: ${rs(e.transport)}`);if(num(e.discount))L.push(`Discount: -${rs(e.discount)}`);if(num(e.gst))L.push(`GST ${e.gst}%: ${rs(t.gst)}`);
+  L.push(`*GRAND TOTAL: ${rs(t.grand)}*`);if(t.subsidy>0)L.push(`Govt. subsidy (${e.subsidy}%): -${rs(t.subsidy)}`,`*Farmer pays: ${rs(t.payable)}*`);
+  L.push(`Advance to confirm order (${S.biz.advPct}%): ${rs(t.adv)}`);if(S.biz.upi)L.push(`Pay by UPI: ${S.biz.upi}`);
+  L.push('',...termsList().map((x,i)=>`${i+1}. ${x}`));return L.join('\n')}
+function waTo(phone,text){const d=String(phone||'').replace(/\D/g,'');const n=d.length===10?'91'+d:(d.length===12?d:'');return`https://wa.me/${n}?text=${encodeURIComponent(text)}`}
+function waLink(){return waTo(S.est.phone,shareText())}
+function remindText(p){const B=S.biz,bal=num(p.quoted)-num(p.paid);return`Namaste ${p.client||''},\nGentle reminder from ${B.name}: a balance of ${rs(bal)} is pending for ${p.scope||'your irrigation work'} (Ref ${p.id}).`+(B.upi?`\nYou can pay by UPI: ${B.upi}`:'')+`\nThank you.\n- ${B.owner}, ${B.phones}`}
+function qrModules(text){if(!window.qrcode)return null;try{const q=window.qrcode(0,'M');q.addData(text);q.make();return{n:q.getModuleCount(),dark:(r,c)=>q.isDark(r,c)}}catch(e){return null}}
+function upiUri(amount){const B=S.biz;return`upi://pay?pa=${encodeURIComponent(B.upi)}&pn=${encodeURIComponent(B.name)}&am=${num(amount).toFixed(2)}&cu=INR&tn=${encodeURIComponent('Advance '+S.est.no)}`}
+function qrSvg(text){const m=qrModules(text);if(!m)return'';let d='';for(let r=0;r<m.n;r++)for(let c=0;c<m.n;c++)if(m.dark(r,c))d+=`M${c+2} ${r+2}h1v1h-1z`;
+  return`<svg viewBox="0 0 ${m.n+4} ${m.n+4}" shape-rendering="crispEdges" role="img" aria-label="UPI QR code"><rect width="100%" height="100%" fill="#fff"/><path d="${d}" fill="#000"/></svg>`}
+async function sharePDF(){if(!(window.jspdf&&window.jspdf.jsPDF))return toast('PDF tool did not load. Check internet once.');
+  let buf;try{buf=buildPDF()}catch(e){return toast('Could not build the PDF')}
+  const name=`${S.est.no}-${(S.est.client||'estimate').replace(/[^\w]+/g,'_')}.pdf`;
+  try{const f=new File([buf],name,{type:'application/pdf'});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:`Quotation ${S.est.no}`,text:`${S.biz.name} - quotation ${S.est.no}`});return}}
+  catch(e){if(e&&e.name==='AbortError')return}
+  saveFile(name,buf)}
+async function copyText(txt){try{await navigator.clipboard.writeText(txt);toast('Copied')}catch(e){const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('Copied')}catch(_){toast('Copy not available')}ta.remove()}}
+
+/* ---------- views ---------- */
+const ICON={
+ estimate:'<svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/></svg>',
+ prices:'<svg viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.2"/></svg>',
+ calc:'<svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h2M12 12h2M8 16h2M12 16h2M16 12v4"/></svg>',
+ projects:'<svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>'};
+const TABS=[['estimate','Estimate'],['prices','Prices'],['calc','Calculator'],['projects','Projects']];
+const field=(label,key,val,type='text',extra='')=>`<label class="f">${label}<input type="${type}" ${type==='number'?'inputmode="decimal"':''} data-k="${key}" value="${esc(val)}" ${extra}></label>`;
+
+function optionsHtml(sel){const cats=[...new Set(S.items.map(i=>i.cat))];
+  return`<option value="">— Select item —</option>`+cats.map(c=>`<optgroup label="${esc(c)}">${S.items.filter(i=>i.cat===c).map(i=>`<option value="${esc(i.id)}" ${i.id===sel?'selected':''}>${esc(i.name)}</option>`).join('')}</optgroup>`).join('')}
+function lineHtml(l,i){const it=itemById(l.item);
+  return`<div class="line" data-i="${i}"><div class="line-top"><span class="sno">${i+1}</span><select data-line="item" aria-label="Item ${i+1}">${optionsHtml(it?it.id:'')}</select><button class="x" data-act="rm-line" aria-label="Remove item ${i+1}">×</button></div>
+  <div class="catline" data-f="cat">${it?esc(it.cat):''}</div>
+  <div class="line-bot"><label class="f qty">Qty<input type="number" inputmode="decimal" data-line="qty" value="${l.qty??''}" min="0"></label>
+  <div class="kv">Rate <b class="num" data-f="rate"></b></div><div class="kv right">Amount <b class="num" data-f="amt"></b></div></div></div>`}
+function paintLine(i){const el=$(`.line[data-i="${i}"]`);if(!el)return;const l=S.est.lines[i],it=itemById(l.item);
+  $('[data-f=cat]',el).textContent=it?it.cat:'';$('[data-f=rate]',el).textContent=it?inr(lineRate(l))+' / '+it.unit:'—';$('[data-f=amt]',el).textContent=it?inr(lineAmt(l)):'—'}
+function paintTotals(){const t=totals();const set=(id,v)=>{const n=$('#'+id);if(n)n.textContent=v};set('t-sub',inr(t.sub));set('t-gst',inr(t.gst));set('t-grand',inr(t.grand));set('t-valid',fmtD(validUntil()));
+  const x=$('#t-extra');if(x){x.innerHTML=(t.subsidy>0?`<div class="trow"><span>Govt. subsidy</span><b class="num">− ${inr(t.subsidy)}</b></div><div class="trow"><span>Farmer pays</span><b class="num">${inr(t.payable)}</b></div>`:'')+
+   `<div class="trow"><span>Advance to confirm order</span><b class="num">${inr(t.adv)} <small class="note">(${num(S.biz.advPct)}%)</small></b></div>`;translateDom(x)}}
+
+function viewEstimate(){const e=S.est;
+  return`<div class="head-row"><div><h1>Client Estimate</h1><p class="sub">Fill in the client and pick items. Rates fill in by price tier.</p></div></div>
+  <section class="card"><h2>Client & site</h2><div class="grid2 stack">
+   ${field('Client name','est.client',e.client)}${field('Village / site','est.site',e.site)}${field('Contact no.','est.phone',e.phone,'tel')}${field('Project type','est.projectType',e.projectType)}</div></section>
+  <section class="card"><h2>Quotation</h2><div class="grid2 stack">
+   ${field('Estimate no.','est.no',e.no)}${field('Estimate date','est.date',e.date,'date','data-calc="1"')}
+   ${field('Valid for (days)','est.validDays',e.validDays,'number','data-calc="1"')}
+   <div class="kv" style="justify-content:flex-end;min-height:44px">Valid until <b id="t-valid"></b></div></div>
+   <div><div class="note" style="margin-bottom:6px;font-weight:600">Price tier</div><div class="seg" role="radiogroup" aria-label="Price tier">
+   ${TIERS.map(([k,n])=>`<input type="radio" name="tier" id="tier-${k}" value="${k}" ${e.tier===k?'checked':''}><label for="tier-${k}">${n}</label>`).join('')}</div></div></section>
+  <section class="card"><h2>Items & services</h2>${e.frozen?'<p class="hint">This estimate uses the prices from when it was saved. <button class="chip" data-act="unfreeze">Use today’s prices</button></p>':''}<div id="lines" style="display:flex;flex-direction:column;gap:10px">${e.lines.map(lineHtml).join('')}</div>
+   ${e.lines.length?'':'<div class="empty">No items yet. Tap “Add item”.</div>'}
+   <button class="btn" data-act="add-line">+ Add item</button></section>
+  <section class="card"><div class="totals">
+   <div class="trow"><span>Subtotal (materials & services)</span><b class="num" id="t-sub"></b></div>
+   <div class="trow"><span>Site delivery & transport (₹)</span><div class="in"><input type="number" inputmode="decimal" data-k="est.transport" data-calc="1" value="${esc(e.transport)}" aria-label="Transport charges"></div></div>
+   <div class="trow"><span>Special discount (₹)</span><div class="in"><input type="number" inputmode="decimal" data-k="est.discount" data-calc="1" value="${esc(e.discount)}" aria-label="Discount"></div></div>
+   <div class="trow"><span>GST / tax (%)</span><div class="in"><input type="number" inputmode="decimal" data-k="est.gst" data-calc="1" value="${esc(e.gst)}" aria-label="GST percent"></div></div>
+   <div class="chips" role="group" aria-label="GST quick pick">${[0,5,12,18].map(v=>`<button class="chip" data-act="gst" data-v="${v}" aria-pressed="${num(e.gst)===v}">${v}%</button>`).join('')}</div>
+   <div class="trow"><span class="note">GST amount</span><span class="num note" id="t-gst"></span></div>
+   <div class="trow"><span>Govt. subsidy (%)</span><div class="in"><input type="number" inputmode="decimal" data-k="est.subsidy" data-calc="1" value="${esc(e.subsidy)}" aria-label="Subsidy percent"></div></div>
+   <p class="hint">Use the subsidy only if the farmer is claiming a micro-irrigation subsidy. Check the current rate with the Horticulture department.</p></div>
+   <div class="grand"><span>Grand total estimate</span><b class="num" id="t-grand"></b></div>
+   <div class="totals" id="t-extra"></div>
+   <div class="btns"><button class="btn primary" data-act="save-est">Save to Projects</button><button class="btn gold" data-act="view-quote">View quotation</button></div>
+   <div class="btns"><button class="btn" data-act="share-pdf">Share PDF</button><a class="btn" id="wa" href="#" target="_blank" rel="noopener">WhatsApp</a><button class="btn" data-act="xl-est">Excel</button><button class="btn danger" data-act="new-est">New estimate</button></div></section>`}
+function afterEstimate(){S.est.lines.forEach((_,i)=>paintLine(i));paintTotals();const wa=$('#wa');if(wa)wa.addEventListener('click',()=>{wa.href=waLink()},{capture:true})}
+
+function viewPrices(){const q=(S._q||'').toLowerCase(),cat=S._cat||'';const cats=[...new Set(S.items.map(i=>i.cat))];
+  const list=S.items.filter(i=>(!cat||i.cat===cat)&&(!q||(i.name+i.code+i.cat+i.spec).toLowerCase().includes(q)));
+  const groups=[...new Set(list.map(i=>i.cat))];
+  return`<div class="head-row"><div><h1>Item Price List</h1><p class="sub">Three price tiers per item. Tap an item to change its prices.${S.pricesUpdated?' Prices updated '+fmtD(S.pricesUpdated)+'.':''}</p></div><div class="btns"><button class="btn small" data-act="adj">Adjust prices</button><button class="btn primary small" data-act="item-new">+ New item</button></div></div>
+  <input type="search" id="q" placeholder="Search item, code or brand" value="${esc(S._q||'')}" aria-label="Search items">
+  <div class="chips" role="group" aria-label="Category"><button class="chip" aria-pressed="${!cat}" data-act="cat" data-cat="">All</button>${cats.map(c=>`<button class="chip" aria-pressed="${cat===c}" data-act="cat" data-cat="${esc(c)}">${esc(c)}</button>`).join('')}</div>
+  <div id="plist" style="display:flex;flex-direction:column;gap:10px">${plistHtml(groups,list)}</div>`}
+function plistHtml(groups,list){if(!list.length)return'<div class="empty">No items match. Try another word.</div>';
+  return groups.map(g=>`<h2 class="cat-h">${esc(g)}</h2>`+list.filter(i=>i.cat===g).map(i=>`<button class="item" data-act="item-edit" data-id="${esc(i.id)}">
+   <div class="item-top"><div><div class="code">${esc(i.code)}</div><div class="item-name">${esc(i.name)}</div></div><span class="unit">per ${esc(i.unit)}</span></div>
+   <div class="tiers">${TIERS.map(([k,n])=>`<div class="tier">${n}<b class="num">${inr(i[k])}</b></div>`).join('')}</div>
+   <div class="spec">${esc(i.spec)} · Spread ${inr(num(i.prem)-num(i.eco))}</div></button>`).join('')).join('')}
+
+function viewCalc(){const c=S.calc;
+  return`<div class="head-row"><div><h1>Irrigation Calculator</h1><p class="sub">Enter the farm details. Quantities and a quick budget appear below.</p></div></div>
+  <section class="card"><h2>Farm / estate site</h2><div class="grid2 stack">
+   ${field('Land area (acres)','calc.area',c.area,'number','data-calc="1" step="any"')}${field('Borewell depth (feet)','calc.depth',c.depth,'number','data-calc="1"')}
+   ${field('Mainline distance, source to field (m)','calc.main',c.main,'number','data-calc="1"')}${field('Sprinkler spacing (m × m)','calc.spacing',c.spacing,'number','data-calc="1" step="any"')}
+   ${field('Drip lateral row spacing (m)','calc.drip',c.drip,'number','data-calc="1" step="any"')}${field('Cable run, panel to borewell (m)','calc.cable',c.cable,'number','data-calc="1"')}</div></section>
+  <section class="card"><h2>Required material</h2><div id="c-out"></div></section>
+  <section class="card"><h2>Quick budget by price tier</h2><div id="c-bud"></div>
+   <button class="btn gold" data-act="calc-apply">Add these items to the estimate</button></section>`}
+function paintCalc(){const r=calc(),b=budget();
+  $('#c-out').innerHTML=[['Recommended submersible pump',r.pump],['Column pipe needed',r.column+' m'],['Mainline HDPE/PVC pipe (incl. 10% wastage)',r.main+' m'],
+   ['Sprinkler sets required',r.spr+' sets'],['Drip lateral pipe (if drip)',r.drip+' m'],['Submersible copper cable (incl. 5%)',r.cable+' m']]
+   .map(([k,v])=>`<div class="out"><span>${k}</span><b class="num">${v}</b></div>`).join('');translateDom($('#c-out'));
+  $('#c-bud').innerHTML=b.rows.map(x=>`<div class="bud"><div class="bud-top"><span>${esc(x.label)}</span><small class="num">${x.qty} ${esc(x.unit)}</small></div>
+   <div class="grid3 num" style="font-size:13px;color:var(--muted)"><span>${inr(x.eco)}</span><span>${inr(x.std)}</span><span>${inr(x.prem)}</span></div></div>`).join('')+
+   `<div class="grid3 note" style="margin-top:8px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;font-size:10px"><span>Economy</span><span>Standard</span><span>Premium</span></div>
+   <div class="bud-tot">${TIERS.map(([k,n])=>`<div class="${S.est.tier===k?'pick':''}">Total<b class="num">${inr(b.tot[k])}</b></div>`).join('')}</div>`;translateDom($('#c-bud'))}
+
+function viewProjects(){const t=projTotals(),f=S._st||'';const list=S.projects.filter(p=>!f||p.status===f).slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const max=Math.max(1,...S.projects.map(p=>num(p.quoted)));
+  return`<div class="head-row"><div><h1>Project & Payment Tracker${S.sample?'<span class="sample">sample data</span>':''}</h1><p class="sub">Cancelled quotes are left out of the totals.</p></div><button class="btn primary small" data-act="proj-new">+ New</button></div>
+  <div class="kpis"><div class="kpi"><span>Total quoted</span><b class="num">${inr(t.quoted)}</b></div><div class="kpi good"><span>Received</span><b class="num">${inr(t.paid)}</b></div>
+   <div class="kpi warn"><span>Pending balance</span><b class="num">${inr(t.pending)}</b></div><div class="kpi"><span>Completed</span><b class="num">${t.done}</b></div></div>
+  <div class="chips" role="group" aria-label="Status"><button class="chip" aria-pressed="${!f}" data-act="st" data-st="">All</button>${STATUSES.map(s=>`<button class="chip" aria-pressed="${f===s}" data-act="st" data-st="${s}">${s}</button>`).join('')}</div>
+  <div style="display:flex;flex-direction:column;gap:10px">${list.length?list.map(p=>{const bal=num(p.quoted)-num(p.paid);const pct=num(p.quoted)?Math.min(100,num(p.paid)/num(p.quoted)*100):0;const sc=STATUSES.indexOf(p.status);const age=Math.floor((Date.now()-parseD(p.date))/864e5);
+   return`<button class="proj" data-act="proj-edit" data-id="${esc(p.id)}"><div class="proj-top"><div style="min-width:0"><div class="code">${esc(p.id)} · ${fmtD(p.date)}${p.status==='Quote Sent'&&age>=3?'<span class="pill s1" style="margin-left:6px">Follow up</span>':''}</div><div class="proj-name">${esc(p.client)||'(no name)'}</div><div class="proj-scope">${esc(p.village)}${p.village&&p.scope?' · ':''}${esc(p.scope)}</div></div><span class="pill s${sc<0?0:sc}">${esc(p.status)}</span></div>
+   <div class="scale" title="Quoted amount compared with the biggest quote"><i style="width:${num(p.quoted)/max*100}%"></i></div>
+   <div class="bar" title="Paid ${Math.round(pct)}%"><i style="width:${pct}%"></i></div>
+   <div class="proj-nums num"><span>Quoted <b>${inr(p.quoted)}</b></span><span>Paid <b>${inr(p.paid)}</b></span><span>Balance <b class="${bal>0?'bal-due':''}">${inr(bal)}</b></span></div></button>`}).join(''):'<div class="empty">No projects here yet. Save an estimate to Projects, or tap “+ New”.</div>'}</div>
+  <p class="note">Gold bar: quote size against the biggest quote. Green bar: share of the quote already paid.</p>`}
+
+const VIEWS={estimate:[viewEstimate,afterEstimate],prices:[viewPrices,()=>{}],calc:[viewCalc,paintCalc],projects:[viewProjects,()=>{}]};
+function render(){const v=VIEWS[S.tab]||VIEWS.estimate;$('#view').innerHTML=v[0]();v[1]();paintBrand();
+  $('#nav').innerHTML=TABS.map(([k,n])=>`<button data-act="tab" data-tab="${k}" ${S.tab===k?'aria-current="page"':''}>${ICON[k==='calc'?'calc':k]}<span>${n}</span></button>`).join('');translateDom($('#view'));translateDom($('#nav'))}
+function paintBrand(){const B=S.biz;$('#b-name').textContent=B.name;$('#b-line').textContent=`Prop: ${B.owner}  |  Ph: ${B.phones}`;$('#b-addr').textContent=B.address;$('#b-tag').textContent=B.tagline;document.title='Irrigation Estimate Book';$('#langbtn').textContent=S.lang==='kn'?'EN':'ಕನ್ನಡ'}
+
+/* ---------- sheets ---------- */
+let sheetAct={};
+function openSheet(title,body,buttons){const lay=$('#layer');lay.innerHTML=`<div class="overlay" data-act="sheet-bg"><div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="sheet-h"><h3 style="font-size:17px">${esc(title)}</h3><button class="x" data-act="sheet-close" aria-label="Close">×</button></div><div class="sheet-b">${body}</div><div class="sheet-f">${buttons.map((b,i)=>`<button class="btn ${b.cls||''}" data-act="sheet-btn" data-i="${i}">${b.label}</button>`).join('')}</div></div></div>`;
+  sheetAct=buttons;translateDom(lay);$('.sheet-b input,.sheet-b select',lay)?.focus({preventScroll:true})}
+const closeSheet=()=>{$('#layer').innerHTML='';sheetAct=[]};
+const sv=id=>($('#'+id)||{}).value??'';
+function arm(btn,label,fn){if(btn.dataset.armed){fn();return}btn.dataset.armed='1';btn.classList.add('armed');const old=btn.textContent;btn.textContent=label;setTimeout(()=>{btn.dataset.armed='';btn.classList.remove('armed');btn.textContent=old},3000)}
+
+function itemSheet(id){const it=id?itemById(id):{code:'',cat:S._cat||'',name:'',unit:'',eco:'',std:'',prem:'',spec:''};const cats=[...new Set(S.items.map(i=>i.cat))];
+  const body=`<div class="grid2 stack"><label class="f">Item code<input id="i-code" value="${esc(it.code)}"></label><label class="f">Category<input id="i-cat" list="cats" value="${esc(it.cat)}"><datalist id="cats">${cats.map(c=>`<option value="${esc(c)}">`).join('')}</datalist></label></div>
+  <label class="f">Item / service description<input id="i-name" value="${esc(it.name)}"></label><label class="f">Unit (Set, Meter, Job…)<input id="i-unit" value="${esc(it.unit)}"></label>
+  <div class="grid3">${TIERS.map(([k,n])=>`<label class="f">${n} ₹<input id="i-${k}" type="number" inputmode="decimal" step="any" value="${esc(it[k])}"></label>`).join('')}</div>
+  <label class="f">Brand / technical spec<input id="i-spec" value="${esc(it.spec)}"></label>`;
+  const btns=[{label:'Save',cls:'primary',fn:()=>{const code=sv('i-code').trim(),name=sv('i-name').trim();if(!code||!name)return toast('Enter a code and a description');
+    if(S.items.some(x=>x.code===code&&x.id!==id))return toast('That item code is already used');
+    const rec={code,cat:sv('i-cat').trim()||'General',name,unit:sv('i-unit').trim()||'Nos',eco:num(sv('i-eco')),std:num(sv('i-std')),prem:num(sv('i-prem')),spec:sv('i-spec').trim()};
+    if(id)Object.assign(itemById(id),rec);else S.items.push({id:'i'+Date.now().toString(36),...rec});persist();closeSheet();render();toast('Item saved')}}];
+  if(id)btns.push({label:'Delete',cls:'danger',fn:function(btn){arm(btn,'Tap again to delete',()=>{S.items=S.items.filter(x=>x.id!==id);S.est.lines.forEach(l=>{if(l.item===id)l.item=''});persist();closeSheet();render();toast('Item deleted')})}});
+  openSheet(id?'Edit item':'New item',body,btns)}
+
+function adjNew(v,pct){const x=num(v)*(1+pct/100);return x>=100?Math.round(x):R(x,1)}
+function applyAdj(pct,cat,tier){let n=0;S.items.forEach(i=>{if(cat&&i.cat!==cat)return;(tier?[tier]:['eco','std','prem']).forEach(k=>{i[k]=adjNew(i[k],pct)});n++});return n}
+function paintAdj(){const pct=num(sv('a-pct')),cat=sv('a-cat'),tier=sv('a-tier')||'std';const list=S.items.filter(i=>!cat||i.cat===cat);const it=list[0];const out=$('#a-prev');
+  out.textContent=(!it||!pct)?'':`Example: ${it.name} (${TIERS.find(x=>x[0]===tier)[1]}) ${inr(it[tier])} → ${inr(adjNew(it[tier],pct))}. ${list.length} items will change. Saved estimates keep their old prices.`}
+function adjSheet(){const cats=[...new Set(S.items.map(i=>i.cat))];
+  const body=`<p class="hint">Raise or lower prices by a percentage, for example when pipe or copper rates change. Use a minus sign to reduce.</p>
+  <label class="f">Change in % (e.g. 5 or -3)<input id="a-pct" type="number" inputmode="decimal" step="any"></label>
+  <label class="f">Category<select id="a-cat"><option value="">All categories</option>${cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')}</select></label>
+  <label class="f">Price tier<select id="a-tier"><option value="">All three tiers</option>${TIERS.map(([k,n])=>`<option value="${k}">${n}</option>`).join('')}</select></label><div class="note" id="a-prev"></div>`;
+  openSheet('Adjust prices',body,[{label:'Apply',cls:'primary',fn:function(btn){const pct=num(sv('a-pct'));if(!pct)return toast('Enter a percentage');
+    arm(btn,'Tap again to apply',()=>{const n=applyAdj(pct,sv('a-cat'),sv('a-tier'));S.pricesUpdated=today();persist();closeSheet();render();toast(n+' items updated')})}}])}
+function projSheet(id){const p=id?S.projects.find(x=>x.id===id):{id:nextNo(),date:today(),client:'',phone:'',village:'',scope:'',quoted:'',paid:0,status:'Quote Sent'};
+  const body=`<div class="grid2 stack"><label class="f">Quote ID<input id="p-id" value="${esc(p.id)}"></label><label class="f">Date<input id="p-date" type="date" value="${esc(p.date)}"></label></div>
+  <div class="grid2 stack"><label class="f">Client / estate name<input id="p-client" value="${esc(p.client)}"></label><label class="f">Client phone<input id="p-phone" type="tel" value="${esc(p.phone||'')}"></label></div><div class="grid2 stack"><label class="f">Village / location<input id="p-village" value="${esc(p.village)}"></label><label class="f">Work scope<input id="p-scope" value="${esc(p.scope)}"></label></div>
+  <div class="grid2 stack"><label class="f">Quoted amount ₹<input id="p-quoted" type="number" inputmode="decimal" value="${esc(p.quoted)}"></label><label class="f">Amount paid ₹<input id="p-paid" type="number" inputmode="decimal" value="${esc(p.paid)}"></label></div>
+  <div class="grid2 stack" style="align-items:end"><label class="f">Add a payment received ₹<input id="p-add" type="number" inputmode="decimal" placeholder="e.g. 20000"></label><button class="btn" id="p-addbtn" data-act="p-add">Add to paid</button></div>
+  <label class="f">Status<select id="p-status">${STATUSES.map(s=>`<option value="${s}" ${p.status===s?'selected':''}>${s}</option>`).join('')}</select></label>${id?'<a class="btn" data-act="p-wa" id="p-wa" href="#" target="_blank" rel="noopener">WhatsApp reminder for balance</a>':''}`;
+  const btns=[{label:'Save',cls:'primary',fn:()=>{const nid=sv('p-id').trim();if(!nid)return toast('Enter a quote ID');if(S.projects.some(x=>x.id===nid&&x!==p))return toast('That quote ID already exists');
+    const rec={id:nid,date:sv('p-date'),client:sv('p-client').trim(),phone:sv('p-phone').trim(),village:sv('p-village').trim(),scope:sv('p-scope').trim(),quoted:num(sv('p-quoted')),paid:num(sv('p-paid')),status:sv('p-status')};
+    if(id)Object.assign(p,rec);else S.projects.push(rec);persist();closeSheet();render();toast('Project saved')}}];
+  if(id&&p.snap)btns.push({label:'Open estimate',fn:()=>{S.est=clone(p.snap);S.tab='estimate';persist();closeSheet();render();scrollTo(0,0)}});
+  if(id&&p.snap)btns.push({label:'Copy to new estimate',fn:()=>{S.est=clone(p.snap);delete S.est.frozen;S.est.no=nextNo();S.est.date=today();S.tab='estimate';persist();closeSheet();render();scrollTo(0,0);toast('Copied. Prices are today’s rates.')}});
+  if(id)btns.push({label:'Delete',cls:'danger',fn:function(btn){arm(btn,'Tap again to delete',()=>{S.projects=S.projects.filter(x=>x!==p);persist();closeSheet();render();toast('Project deleted')})}});
+  openSheet(id?'Edit project':'New project',body,btns)}
+
+function settingsSheet(){const B=S.biz;
+  const body=`<label class="f">Business name<input id="s-name" value="${esc(B.name)}"></label><div class="grid2 stack"><label class="f">Proprietor<input id="s-owner" value="${esc(B.owner)}"></label><label class="f">Phone numbers<input id="s-phones" value="${esc(B.phones)}"></label></div>
+  <label class="f">Address<input id="s-addr" value="${esc(B.address)}"></label><label class="f">Services line<input id="s-tag" value="${esc(B.tagline)}"></label>
+  <div class="grid2 stack"><label class="f">Default transport ₹<input id="s-trans" type="number" inputmode="decimal" value="${esc(B.defTransport)}"></label><label class="f">Default validity (days)<input id="s-valid" type="number" inputmode="decimal" value="${esc(B.defValid)}"></label></div>
+  <div class="grid2 stack"><label class="f">UPI ID (QR on quotations)<input id="s-upi" value="${esc(B.upi)}" placeholder="name@bank"></label><label class="f">Advance to confirm order (%)<input id="s-adv" type="number" inputmode="decimal" value="${esc(B.advPct)}"></label></div>
+  <label class="f">Terms & warranty (one per line; {days} becomes the validity days)<textarea id="s-terms">${esc(B.terms.join('\n'))}</textarea></label>
+  ${DP?'<button class="btn gold" data-act="install">Install app on this phone</button>':''}
+  <h2>Backup & data</h2><p class="note" style="margin:0">Everything is stored on this phone. Save a backup now and then, so a cleared browser does not lose the work.</p>
+  <div class="btns"><button class="btn" data-act="backup">Save backup</button><button class="btn" data-act="restore">Restore backup</button><button class="btn" data-act="xl-all">All data to Excel</button></div>
+  <input type="file" id="rf" accept=".json,application/json" hidden>
+  <button class="btn danger" data-act="clear-sample">Clear sample data (start fresh)</button>`;
+  openSheet('Business details & backup',body,[{label:'Save details',cls:'primary',fn:()=>{Object.assign(B,{name:sv('s-name').trim()||B.name,owner:sv('s-owner').trim(),phones:sv('s-phones').trim(),address:sv('s-addr').trim(),tagline:sv('s-tag').trim(),defTransport:num(sv('s-trans')),defValid:num(sv('s-valid'))||15,upi:sv('s-upi').trim(),advPct:Math.min(100,Math.max(0,num(sv('s-adv')))),terms:sv('s-terms').split('\n')});persist();closeSheet();render();toast('Details saved')}}])}
+
+function quoteView(){const e=S.est,B=S.biz,t=totals();let n=0;const qs=B.upi?qrSvg(upiUri(t.adv)):'';const upiBlock=qs?`<div class="qr">${qs}<div><b>Scan to pay the advance by UPI</b><br>${esc(B.upi)}<br>${inr(t.adv)}</div></div>`:'';
+  const rows=e.lines.map(l=>{const it=itemById(l.item);if(!it)return'';n++;return`<tr><td>${n}</td><td>${esc(it.name)}</td><td>${esc(it.unit)}</td><td class="r num">${num(l.qty).toLocaleString('en-IN')}</td><td class="r num">${inr(lineRate(l))}</td><td class="r num">${inr(lineAmt(l))}</td></tr>`}).join('');
+  $('#layer').innerHTML=`<div class="overlay" style="align-items:stretch"><div class="paper-wrap" role="dialog" aria-modal="true" aria-label="Quotation"><div class="paper-bar"><button class="btn" data-act="sheet-close">Close</button><button class="btn" data-act="pdf-est">PDF</button><button class="btn primary" data-act="share-pdf">Share PDF</button><a class="btn" id="wa2" href="#" target="_blank" rel="noopener">WhatsApp</a><button class="btn" data-act="copy-q">Copy text</button></div>
+  <div class="paper-scroll"><div class="paper"><div class="lh"><b>${esc(B.name)}</b><small>Prop: ${esc(B.owner)} | Ph: ${esc(B.phones)}</small><small>${esc(B.address)}</small><small style="color:#f5c864">${esc(B.tagline)}</small></div>
+  <div class="pb"><h4>QUOTATION / ESTIMATE</h4><div class="info"><div><span>Client</span>${esc(e.client)||'-'}</div><div><span>Estimate no.</span>${esc(e.no)}</div><div><span>Village / site</span>${esc(e.site)||'-'}</div><div><span>Date</span>${fmtD(e.date)}</div>
+  <div><span>Contact</span>${esc(e.phone)||'-'}</div><div><span>Valid until</span>${fmtD(validUntil())}</div><div><span>Project</span>${esc(e.projectType)||'-'}</div><div><span>Price tier</span>${TIERS.find(x=>x[0]===e.tier)[1]}</div></div>
+  <div class="tw"><table><thead><tr><th>#</th><th>Item / service</th><th>Unit</th><th class="r">Qty</th><th class="r">Rate</th><th class="r">Amount</th></tr></thead><tbody>${rows||'<tr><td colspan="6">No items added.</td></tr>'}</tbody></table></div>
+  <div class="sum num"><div><span>Subtotal</span><span>${inr(t.sub)}</span></div><div><span>Transport</span><span>${inr(e.transport)}</span></div>${num(e.discount)?`<div><span>Discount</span><span>- ${inr(e.discount)}</span></div>`:''}${num(e.gst)?`<div><span>GST ${esc(e.gst)}%</span><span>${inr(t.gst)}</span></div>`:''}<div class="g"><span>GRAND TOTAL</span><span>${inr(t.grand)}</span></div>${t.subsidy>0?`<div><span>Govt. subsidy <small>(${esc(e.subsidy)}%)</small></span><span>− ${inr(t.subsidy)}</span></div><div class="g"><span>Farmer pays</span><span>${inr(t.payable)}</span></div>`:''}<div><span>Advance to confirm order <small>(${num(B.advPct)}%)</small></span><span>${inr(t.adv)}</span></div></div>${upiBlock}
+  <div><h4 style="font-size:12px">TERMS & WARRANTY NOTES</h4><ol>${termsList().map(x=>`<li>${esc(x)}</li>`).join('')}</ol></div>
+  <div class="sig">For ${esc(B.name.toUpperCase())}<b>Authorized Signatory — ${esc(B.owner)}</b></div></div></div></div></div></div>`;
+  $('#wa2').addEventListener('click',()=>{$('#wa2').href=waLink()},{capture:true});translateDom($('#layer'))}
+
+/* ---------- events ---------- */
+function setPath(path,val){const p=path.split('.');let o=S;for(let i=0;i<p.length-1;i++)o=o[p[i]];o[p[p.length-1]]=val}
+document.addEventListener('input',ev=>{const t=ev.target;
+  if(t.id&&t.id.startsWith('a-')){paintAdj();return}
+  if(t.id==='q'){S._q=t.value;$('#plist').innerHTML=(()=>{const q=t.value.toLowerCase(),cat=S._cat||'';const list=S.items.filter(i=>(!cat||i.cat===cat)&&(!q||(i.name+i.code+i.cat+i.spec).toLowerCase().includes(q)));return plistHtml([...new Set(list.map(i=>i.cat))],list)})();return}
+  if(t.dataset.k){setPath(t.dataset.k,t.type==='number'?(t.value===''?'':num(t.value)):t.value);persist();
+    if(t.dataset.k.startsWith('est.'))paintTotals();if(t.dataset.k.startsWith('calc.'))paintCalc();return}
+  if(t.dataset.line){const i=+t.closest('.line').dataset.i;if(t.dataset.line==='qty')S.est.lines[i].qty=t.value===''?'':num(t.value);paintLine(i);paintTotals();persist()}});
+document.addEventListener('change',ev=>{const t=ev.target;
+  if(t.dataset.line==='item'){const i=+t.closest('.line').dataset.i;S.est.lines[i].item=t.value;paintLine(i);paintTotals();persist()}
+  if(t.name==='tier'){S.est.tier=t.value;S.est.lines.forEach((_,i)=>paintLine(i));paintTotals();persist()}
+  if(t.id==='rf'&&t.files[0]){const fr=new FileReader();fr.onload=()=>{try{const d=JSON.parse(fr.result);if(!d.est||!d.items||!d.biz)throw 0;S=d;persist();closeSheet();render();toast('Backup restored')}catch(e){toast('That file is not a valid backup')}};fr.readAsText(t.files[0])}});
+document.addEventListener('click',ev=>{const b=ev.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
+  if(a==='sheet-bg'){if(ev.target===b)closeSheet();return}
+  if(a==='sheet-close')return closeSheet();
+  if(a==='sheet-btn')return sheetAct[+b.dataset.i].fn(b);
+  if(a==='tab'){S.tab=b.dataset.tab;persist();render();scrollTo(0,0)}
+  else if(a==='add-line'){S.est.lines.push({item:'',qty:1});persist();render();const ls=$$('.line');ls[ls.length-1]?.scrollIntoView({block:'center'})}
+  else if(a==='rm-line'){S.est.lines.splice(+b.closest('.line').dataset.i,1);persist();render()}
+  else if(a==='save-est'){const e=S.est,t=totals();let p=S.projects.find(x=>x.id===e.no);
+    e.frozen=e.frozen||{};e.lines.forEach(l=>{const it=itemById(l.item);if(it&&!e.frozen[l.item])e.frozen[l.item]={eco:it.eco,std:it.std,prem:it.prem}});
+    const rec={date:e.date,client:e.client,village:e.site,phone:e.phone,scope:e.projectType,quoted:t.grand,snap:clone(e)};
+    if(p)Object.assign(p,rec);else S.projects.push({id:e.no,paid:0,status:'Quote Sent',...rec});persist();toast(p?'Project updated':'Saved to Projects')}
+  else if(a==='view-quote')quoteView();
+  else if(a==='pdf-est')exportPDF();
+  else if(a==='xl-est')exportEstimateXlsx();
+  else if(a==='xl-all')exportAllXlsx();
+  else if(a==='copy-q')copyText(shareText());
+  else if(a==='new-est')arm(b,'Tap again: start blank',()=>{S.est=blankEst();persist();render();scrollTo(0,0);toast('New estimate '+S.est.no)});
+  else if(a==='cat'){S._cat=b.dataset.cat;render()}
+  else if(a==='item-edit')itemSheet(b.dataset.id);
+  else if(a==='item-new')itemSheet(null);
+  else if(a==='st'){S._st=b.dataset.st;render()}
+  else if(a==='proj-edit')projSheet(b.dataset.id);
+  else if(a==='proj-new')projSheet(null);
+  else if(a==='p-add'){const add=num(sv('p-add'));if(!add)return toast('Enter the amount received');$('#p-paid').value=num(sv('p-paid'))+add;$('#p-add').value='';
+    if(num(sv('p-paid'))>=num(sv('p-quoted'))&&num(sv('p-quoted'))>0&&sv('p-status')!=='Completed')toast('Fully paid. You can mark it Completed.')}
+  else if(a==='lang'){S.lang=S.lang==='kn'?'en':'kn';persist();closeSheet();render()}
+  else if(a==='gst'){S.est.gst=+b.dataset.v;persist();render()}
+  else if(a==='unfreeze'){delete S.est.frozen;persist();render();toast('Now using today’s prices')}
+  else if(a==='share-pdf')sharePDF();
+  else if(a==='adj')adjSheet();
+  else if(a==='p-wa'){b.href=waTo(sv('p-phone'),remindText({client:sv('p-client'),scope:sv('p-scope'),id:sv('p-id'),quoted:sv('p-quoted'),paid:sv('p-paid')}))}
+  else if(a==='install'){if(DP){DP.prompt();DP=null;closeSheet()}}
+  else if(a==='settings')settingsSheet();
+  else if(a==='backup')saveFile(`siddalingeshwara-backup-${today()}.json`,JSON.stringify(S,null,1),'application/json');
+  else if(a==='restore')$('#rf').click();
+  else if(a==='clear-sample')arm(b,'Tap again to remove',()=>{S.projects=[];S.sample=false;S.est=blankEst();persist();closeSheet();render();toast('Sample data cleared')});
+  else if(a==='calc-apply'){const r=calc();const need=[['PMP-02',1],['HDP-02',r.main],['PVC-04',r.column],['ACC-02',r.spr],['ELC-01',r.cable],['SRV-01',1]];let added=0;
+    need.forEach(([code,q])=>{const it=itemByCode(code);if(!it)return;const ex=S.est.lines.find(l=>l.item===it.id);if(ex)ex.qty=q;else S.est.lines.push({item:it.id,qty:q});added++});
+    S.est.lines=S.est.lines.filter((l,i,arr)=>l.item||arr.length===1);persist();S.tab='estimate';render();scrollTo(0,0);toast(added+' items added to the estimate')}});
+document.addEventListener('keydown',ev=>{if(ev.key==='Escape')closeSheet()});
+render();
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+try{if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)&&!window.claude)navigator.serviceWorker.register('sw.js')}catch(e){}
+</script>
+</body></html>
